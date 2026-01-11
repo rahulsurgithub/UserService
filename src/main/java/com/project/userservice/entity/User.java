@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User extends BaseModel {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private int id;
 
     private String firstname;
 
@@ -26,7 +26,7 @@ public class User {
     public User() { }
 
     public User(int id, String firstname, String lastname, String username, String password, String email, String phone) {
-        this.id = id;
+//        this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.username = username;
@@ -35,13 +35,13 @@ public class User {
         this.phone = phone;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+//    public int getId() {
+//        return id;
+//    }
+//
+//    public void setId(int id) {
+//        this.id = id;
+//    }
 
     public String getFirstname() {
         return firstname;

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,9 +30,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUser(int id) {
+    public UserDto getUser(Long id) {
         Optional<User> opt = userRepository.findById(id);
         return opt.map(this::toDto).orElse(null);
+    }
+
+    @Override
+    public List<UserDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return users.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDto updateUser(Long id, UserDto userDto) {
+        Optional<User> opt = userRepository.findById(id);
+        if (opt.isEmpty()) return null;
+        User existing = opt.get();
+        // update fields
+        existing.setFirstname(userDto.firstname());
+        existing.setLastname(userDto.lastname());
+        existing.setUsername(userDto.username());
+        existing.setPassword(userDto.password());
+        existing.setEmail(userDto.email());
+        existing.setPhone(userDto.phone());
+        User saved = userRepository.save(existing);
+        return toDto(saved);
+    }
+
+    @Override
+    public boolean deleteUser(Long id) {
+        Optional<User> opt = userRepository.findById(id);
+        if (opt.isEmpty()) {
+            return false;
+        }
+        userRepository.deleteById(id);
+        return true;
     }
 
     private UserDto toDto(User user) {

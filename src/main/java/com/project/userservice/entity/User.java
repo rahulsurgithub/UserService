@@ -6,10 +6,6 @@ import jakarta.persistence.*;
 @Table(name = "users")
 public class User extends BaseModel {
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private int id;
-
     private String firstname;
 
     private String lastname;
@@ -25,8 +21,8 @@ public class User extends BaseModel {
 
     public User() { }
 
-    public User(int id, String firstname, String lastname, String username, String password, String email, String phone) {
-//        this.id = id;
+    public User(Long id, String firstname, String lastname, String username, String password, String email, String phone) {
+        this.setId(id);
         this.firstname = firstname;
         this.lastname = lastname;
         this.username = username;
@@ -34,14 +30,6 @@ public class User extends BaseModel {
         this.email = email;
         this.phone = phone;
     }
-
-//    public int getId() {
-//        return id;
-//    }
-//
-//    public void setId(int id) {
-//        this.id = id;
-//    }
 
     public String getFirstname() {
         return firstname;

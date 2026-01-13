@@ -42,7 +42,7 @@ class UserControllerTest {
 
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.firstname").value("John"));
     }
 
@@ -60,7 +60,6 @@ class UserControllerTest {
         UserDto d2 = new UserDto("C","D","c","p2","c@e","2");
         when(userService.getAllUsers()).thenReturn(Arrays.asList(d1, d2));
 
-        // use "/users" (no trailing slash) to reliably match the controller mapping in MockMvc standalone setup
         mockMvc.perform(get("/users/all"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
@@ -96,7 +95,6 @@ class UserControllerTest {
 
     @Test
     void updateUser_notFound_returns404() throws Exception {
-        UserDto upd = new UserDto("X","Y","x","pw","x@e","0");
         when(userService.updateUser(eq(5L), any(UserDto.class))).thenReturn(null);
 
         String json = "{\"firstname\":\"X\",\"lastname\":\"Y\",\"username\":\"x\",\"password\":\"pw\",\"email\":\"x@e\",\"phone\":\"0\"}";

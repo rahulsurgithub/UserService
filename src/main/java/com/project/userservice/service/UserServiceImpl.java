@@ -2,13 +2,16 @@ package com.project.userservice.service;
 
 import com.project.userservice.dto.UserDto;
 import com.project.userservice.entity.User;
+import com.project.userservice.entity.Session;
 import com.project.userservice.repository.UserRepository;
+import com.project.userservice.repository.SessionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,10 +19,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final SessionRepository sessionRepository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, SessionRepository sessionRepository) {
         this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     @Override
@@ -64,6 +69,30 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         userRepository.deleteById(id);
+        return true;
+    }
+
+    @Override
+    public String login(String email, String password) {
+        Optional<User> opt = userRepository.findAll().stream().filter(u -> email.equals(u.getEmail())).findFirst();
+        if (opt.isEmpty()) return null;
+        User user = opt.get();
+        if (!user.getPassword().equals(password)) return null;
+        String token = UUID.randomUUID().toString();
+        Session session = new Session();
+        session.setToken(token);
+        // Convert user id (Long) to Integer for session.userId
+        Long uid = user.getId();
+        session.setUserId(uid == null ? null : uid.intValue());
+        sessionRepository.save(session);
+        return token;
+    }
+
+    @Override
+    public boolean logout(String token) {
+        Optional<Session> opt = sessionRepository.findByToken(token);
+        if (opt.isEmpty()) return false;
+        sessionRepository.delete(opt.get());
         return true;
     }
 

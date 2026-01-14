@@ -2,7 +2,9 @@ package com.project.userservice.service;
 
 import com.project.userservice.dto.UserDto;
 import com.project.userservice.entity.User;
+import com.project.userservice.entity.Session;
 import com.project.userservice.repository.UserRepository;
+import com.project.userservice.repository.SessionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +25,9 @@ class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private SessionRepository sessionRepository;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -117,5 +122,57 @@ class UserServiceImplTest {
         assertFalse(ok);
         verify(userRepository, never()).deleteById(anyLong());
     }
-}
 
+    // New tests for authentication/session methods
+    @Test
+    void login_success_createsSessionAndReturnsToken() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1));
+        when(sessionRepository.save(any(Session.class))).thenAnswer(invocation -> {
+            Session s = invocation.getArgument(0);
+            s.setSessionId(100); // simulate generated id
+            return s;
+        });
+
+        String token = userService.login("john@example.com", "pass");
+        assertNotNull(token);
+        verify(sessionRepository, times(1)).save(any(Session.class));
+    }
+
+    @Test
+    void login_wrongPassword_returnsNull() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1));
+
+        String token = userService.login("john@example.com", "wrong");
+        assertNull(token);
+        verify(sessionRepository, never()).save(any(Session.class));
+    }
+
+    @Test
+    void login_userNotFound_returnsNull() {
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user2));
+
+        String token = userService.login("noone@example.com", "pass");
+        assertNull(token);
+        verify(sessionRepository, never()).save(any(Session.class));
+    }
+
+    @Test
+    void logout_existingSession_deletesAndReturnsTrue() {
+        Session s = new Session();
+        s.setToken("tok");
+        when(sessionRepository.findByToken("tok")).thenReturn(Optional.of(s));
+
+        boolean ok = userService.logout("tok");
+        assertTrue(ok);
+        verify(sessionRepository, times(1)).delete(s);
+    }
+
+    @Test
+    void logout_sessionNotFound_returnsFalse() {
+        when(sessionRepository.findByToken("bad")).thenReturn(Optional.empty());
+
+        boolean ok = userService.logout("bad");
+        assertFalse(ok);
+        verify(sessionRepository, never()).delete(any(Session.class));
+    }
+}

@@ -10,4 +10,8 @@ public interface UserService {
     List<UserDto> getAllUsers();
     UserDto updateUser(Long id, UserDto userDto);
     boolean deleteUser(Long id);
+
+    // Authentication/session management
+    String login(String email, String password);
+    boolean logout(String token);
 }

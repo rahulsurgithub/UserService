@@ -1,6 +1,7 @@
 package com.project.userservice.controller;
 
 import com.project.userservice.dto.UserDto;
+import com.project.userservice.dto.LoginDto;
 import com.project.userservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -121,5 +122,69 @@ class UserControllerTest {
         mockMvc.perform(delete("/users/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("User not found"));
+    }
+
+    // New tests for login/logout
+    @Test
+    void login_success_returnsToken() throws Exception {
+        when(userService.login("john@example.com", "pass")).thenReturn("sometoken");
+
+        String json = "{\"email\":\"john@example.com\",\"password\":\"pass\"}";
+
+        mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").value("sometoken"));
+    }
+
+    @Test
+    void login_invalid_returnsUnauthorized() throws Exception {
+        when(userService.login("bad@e","pw")).thenReturn(null);
+
+        String json = "{\"email\":\"bad@e\",\"password\":\"pw\"}";
+
+        mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error").value("Invalid credentials"));
+    }
+
+    @Test
+    void logout_success_returnsMessage() throws Exception {
+        when(userService.logout("tkn")).thenReturn(true);
+
+        String json = "{\"token\":\"tkn\"}";
+
+        mockMvc.perform(post("/users/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Logged out"));
+    }
+
+    @Test
+    void logout_missingToken_returnsBadRequest() throws Exception {
+        String json = "{}";
+
+        mockMvc.perform(post("/users/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("token required"));
+    }
+
+    @Test
+    void logout_notFound_returns404() throws Exception {
+        when(userService.logout("bad")).thenReturn(false);
+
+        String json = "{\"token\":\"bad\"}";
+
+        mockMvc.perform(post("/users/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("session not found"));
     }
 }

@@ -7,8 +7,10 @@ import dev.project.userservice.repositories.RoleRepository;
 import dev.project.userservice.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -21,15 +23,14 @@ public class UserService {
     }
 
     public UserDto getUserDetails(Long userId) {
-        System.out.println("I got the request");
-        return new UserDto();
-//        Optional<User> userOptional = userRepository.findById(userId);
-//
-//        if (userOptional.isEmpty()) {
-//            return null;
-//        }
-//
-//        return UserDto.from(userOptional.get());
+        // use repository method that fetches roles eagerly
+        Optional<User> userOptional = this.userRepository.findByIdWithRoles(userId);
+
+        if (userOptional.isEmpty()) {
+            return null;
+        }
+
+        return UserDto.from(userOptional.get());
     }
 
     public UserDto setUserRoles(Long userId, List<Long> roleIds) {
@@ -41,7 +42,9 @@ public class UserService {
         }
 
         User user = userOptional.get();
-//        user.setRoles(Set.copyOf(roles));
+        // Use a mutable set so Hibernate can manage and merge the collection
+        Set<Role> roleSet = new HashSet<>(roles);
+        user.setRoles(roleSet);
 
         User savedUser = userRepository.save(user);
 

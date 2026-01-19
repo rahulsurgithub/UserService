@@ -20,7 +20,11 @@ public class UserController {
     public ResponseEntity<UserDto> getUserDetails(@PathVariable("id") Long userId) {
         UserDto userDto = userService.getUserDetails(userId);
 
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+        if (userDto == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("/{id}/roles")

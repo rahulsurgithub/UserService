@@ -9,4 +9,12 @@ import java.util.List;
 @Setter
 public class SetUserRolesRequestDto {
     private List<Long> roleIds;
+
+    public List<Long> getRoleIds() {
+        return this.roleIds;
+    }
+
+    public void setRoleIds(List<Long> roleIds) {
+        this.roleIds = roleIds;
+    }
 }

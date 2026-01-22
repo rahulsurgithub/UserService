@@ -34,12 +34,6 @@ public class AuthController {
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
-//    @GetMapping("/signup")
-//    public String signUp() {
-////        UserDto userDto = authService.signUp(request.getEmail(), request.getPassword());
-//        return "hello";
-//    }
-
     @PostMapping("/validate")
     public ResponseEntity<SessionStatus> validateToken(@RequestBody ValidateTokenRequestDto request) {
         SessionStatus sessionStatus = authService.validate(request.getToken(), request.getUserId());

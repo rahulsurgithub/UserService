@@ -7,6 +7,18 @@ The project is in working condition with unit tests in place 100% code coverage
 Take main branch for latest code
 https://github.com/rahulsurgithub/UserService/tree/main
 
+# DB Scripts to create database in AWS and local
+CREATE DATABASE userservicedatabase;
+create user userservice;
+GRANT ALL PRIVILEGES ON userservicedatabase.* TO userservice;
+FLUSH PRIVILEGES;
+
+use userservicedatabase
+select * from user
+select * from session
+select * from role
+select * from user_roles
+
 # UserService
 
 User service backend project (Spring Boot, Maven) used for a masters program.  
@@ -52,8 +64,8 @@ Project provides user and role management REST APIs with caching, tests and CI-r
 ## Configuration
 1. Primary config files:
    1. `src/main/resources/application.properties` (or `application.yml`)
-2. Common properties to set:
-   1. `spring.datasource.url=jdbc:mysql://localhost:3306/userservicedatabase`
+2. Common properties to set (aws):
+   1. `spring.datasource.url=jdbc:mysql://userservicedatabase.ct8888y8wuu8.eu-north-1.rds.amazonaws.com:3306/userservicedatabase`
    2. `spring.datasource.username=${DB_USER}`
    3. `spring.datasource.password=${DB_PASS}`
    4. `spring.redis.host=<redis-endpoint>`

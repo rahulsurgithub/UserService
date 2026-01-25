@@ -7,6 +7,16 @@ The project is in working condition with unit tests in place 100% code coverage
 Take main branch for latest code
 https://github.com/rahulsurgithub/UserService/tree/main
 
+# DB Scripts to create database in AWS and local
+CREATE DATABASE userservicedatabase
+GRANT ALL PRIVILEGES ON userservicedatabase.* TO 'root'@'localhost';
+
+use userservicedatabase
+select * from user
+select * from session
+select * from role
+select * from user_roles
+
 # UserService
 
 User service backend project (Spring Boot, Maven) used for a masters program.  

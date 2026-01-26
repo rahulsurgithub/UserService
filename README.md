@@ -19,6 +19,10 @@ select * from session
 select * from role
 select * from user_roles
 
+# EC2 instance deployed
+
+userservice-0.0.1-SNAPSHOT.jar is deployed to the Elastic Beanstalk environment
+
 # UserService
 
 User service backend project (Spring Boot, Maven) used for a masters program.  
